@@ -3,11 +3,13 @@ package com.example.petclinic.controller;
 import com.example.petclinic.model.Owner;
 import com.example.petclinic.model.Pet;
 import com.example.petclinic.model.PetWithOwner;
+import com.example.petclinic.service.OwnerServiceProxy;
 import com.example.petclinic.service.PetService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -23,10 +25,14 @@ public class PetController implements BasicController<Pet> {
     private static final Logger logger = LoggerFactory.getLogger(PetController.class.getName());
 
     private PetService petService;
+    //new added in feign
+    private  OwnerServiceProxy ownerServiceProxy;
 
-    public PetController(PetService petService) {
+
+    public PetController(PetService petService, OwnerServiceProxy ownerServiceProxy) {
 
         this.petService = petService;
+        this.ownerServiceProxy = ownerServiceProxy;
     }
 
     @Override
@@ -45,11 +51,13 @@ public class PetController implements BasicController<Pet> {
         PetWithOwner petWithOwner = new PetWithOwner();
         petWithOwner.setPet(this.petService.get(id));
 
-        URI uri = URI.create("http://localhost:9191/ownerapi/owner/getById/" + petWithOwner.getOwnerId());
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Owner> response = restTemplate.getForEntity(uri, Owner.class);
-        Owner owner = response.getBody();
+//        URI uri = URI.create("http://localhost:9191/ownerapi/owner/getById/" + petWithOwner.getOwnerId());
+//        RestTemplate restTemplate = new RestTemplate();
+//        ResponseEntity<Owner> response = restTemplate.getForEntity(uri, Owner.class);
+//        Owner owner = response.getBody();
 
+        //new with feign
+        Owner owner = ownerServiceProxy.getOwnerById(petWithOwner.getOwnerId());
         petWithOwner.setOwner(owner);
 
         return petWithOwner;

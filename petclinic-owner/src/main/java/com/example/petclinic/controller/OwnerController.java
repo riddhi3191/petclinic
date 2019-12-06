@@ -2,6 +2,8 @@ package com.example.petclinic.controller;
 
 import com.example.petclinic.models.Owner;
 import com.example.petclinic.service.OwnerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -13,6 +15,7 @@ import java.util.List;
 public class OwnerController implements BasicController<Owner> {
 
     private OwnerService ownerService;
+    private static final Logger logger = LoggerFactory.getLogger(OwnerController.class.getName());
 
 
     public OwnerController(OwnerService ownerService) {
@@ -34,6 +37,8 @@ public class OwnerController implements BasicController<Owner> {
         Owner owner = null;
         try {
             owner = this.ownerService.get(id);
+            logger.info("---Request made---");
+
         } catch (Exception exc) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Owner [" + id + "] Not Found", exc);
